@@ -1,10 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+// icons
 import { BsArrowUpRight } from "react-icons/bs";
 import { AiOutlinePlus } from "react-icons/ai";
+// custom hook
+import { useBlogsContext } from "../hooks/useBlogsContext";
 
 const Home = () => {
-  const [blogs, setBlogs] = useState(null);
+  const { blogs, dispatch } = useBlogsContext();
+
+  const handleClick = async (id) => {
+    const response = await fetch("/api/blogs/" + id, {
+      method: "DELETE",
+    });
+    const json = await response.json();
+
+    if (response.ok) {
+      dispatch({ type: "DELETE_BLOG", payload: json });
+    }
+  };
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -12,12 +26,12 @@ const Home = () => {
       const json = await response.json();
 
       if (response.ok) {
-        setBlogs(json);
+        dispatch({ type: "SET_BLOGS", payload: json });
       }
     };
 
     fetchBlogs();
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="home">
@@ -42,7 +56,13 @@ const Home = () => {
                   Edit
                 </Link>
 
-                <a href="#" className="delete">
+                <a
+                  href="#"
+                  className="delete"
+                  onClick={() => {
+                    handleClick(blog._id);
+                  }}
+                >
                   Delete
                 </a>
               </div>
