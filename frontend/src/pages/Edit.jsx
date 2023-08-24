@@ -54,7 +54,7 @@ const Edit = () => {
   return (
     <div className="edit">
       <div className="editProductHeader">
-        <h2>Edit Blog</h2>
+        <h2>Edit Product</h2>
         <Link to="/">
           <BsArrowLeft size={15} />
           Go Home
