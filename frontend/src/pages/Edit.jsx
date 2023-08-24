@@ -1,18 +1,17 @@
 import React, { useState } from "react";
-import { useProductsContext } from "../hooks/useProductsContext";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 // icons
 import { BsArrowLeft } from "react-icons/bs";
 
-const Create = () => {
-  const { dispatch } = useProductsContext();
+const Edit = () => {
+  const location = useLocation();
+  const Product = location.state;
 
-  const [name, setName] = useState("");
-  const [unit, setUnit] = useState("");
-  const [price, setPrice] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [inventory, setInventory] = useState("");
-  const [image, setImage] = useState(null);
+  const [name, setName] = useState(Product?.name);
+  const [unit, setUnit] = useState(Product?.unit);
+  const [price, setPrice] = useState(Product?.price);
+  const [expiry, setExpiry] = useState(Product?.expiry);
+  const [inventory, setInventory] = useState(Product?.inventory);
 
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
@@ -20,17 +19,15 @@ const Create = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("unit", unit);
-    formData.append("price", price);
-    formData.append("expiry", expiry);
-    formData.append("inventory", inventory);
-    formData.append("image", image);
 
-    const response = await fetch("/api/products", {
-      method: "POST",
-      body: formData,
+    const product = { name, unit, price, expiry, inventory };
+
+    const response = await fetch("/api/products/" + Product._id, {
+      method: "PATCH",
+      body: JSON.stringify(product),
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
     const json = await response.json();
 
@@ -45,11 +42,9 @@ const Create = () => {
       setPrice("");
       setExpiry("");
       setInventory("");
-      setImage(null);
 
       setError(null);
       setEmptyFields([]);
-      dispatch({ type: "ADD_PRODUCT", payload: json });
       setSubmitted(true);
     }
   };
@@ -57,16 +52,16 @@ const Create = () => {
   if (submitted) return <Navigate to="/" />;
 
   return (
-    <div className="create">
-      <div className="createProductHeader">
-        <h2>Add New Product</h2>
+    <div className="edit">
+      <div className="editProductHeader">
+        <h2>Edit Blog</h2>
         <Link to="/">
           <BsArrowLeft size={15} />
           Go Home
         </Link>
       </div>
 
-      <form className="createProductForm" onSubmit={handleSubmit}>
+      <form className="editProductForm" onSubmit={handleSubmit}>
         <label>Product Name:</label>
         <input
           type="text"
@@ -95,7 +90,7 @@ const Create = () => {
         <input
           type="date"
           onChange={(e) => setExpiry(e.target.value)}
-          value={expiry}
+          value={expiry.substr(0, 10)}
           className={emptyFields.includes("expiry") ? "error" : ""}
         />
 
@@ -107,18 +102,11 @@ const Create = () => {
           className={emptyFields.includes("inventory") ? "error" : ""}
         />
 
-        <label>Product Image:</label>
-        <input
-          type="file"
-          onChange={(e) => setImage(e.target.files[0])}
-          className={emptyFields.includes("image") ? "error" : ""}
-        />
-
-        <button>Add Product</button>
+        <button>Edit Product</button>
         {error && <div className="error errorText">{error}</div>}
       </form>
     </div>
   );
 };
 
-export default Create;
+export default Edit;

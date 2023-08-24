@@ -2,8 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // pages and components
 import Home from "./pages/Home";
-import About from "./pages/About";
 import Create from "./pages/Create";
+import Edit from "./pages/Edit";
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -16,10 +16,10 @@ function App() {
             <Route path="/" element={<Home />} />
           </Routes>
           <Routes>
-            <Route path="/about" element={<About />} />
+            <Route path="/create" element={<Create />} />
           </Routes>
           <Routes>
-            <Route path="/create" element={<Create />} />
+            <Route path="/edit" element={<Edit />} />
           </Routes>
         </div>
       </BrowserRouter>

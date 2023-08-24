@@ -4,55 +4,87 @@ import { Link } from "react-router-dom";
 import { BsArrowUpRight } from "react-icons/bs";
 import { AiOutlinePlus } from "react-icons/ai";
 // custom hook
-import { useBlogsContext } from "../hooks/useBlogsContext";
+import { useProductsContext } from "../hooks/useProductsContext";
 
 const Home = () => {
-  const { blogs, dispatch } = useBlogsContext();
+  const { products, dispatch } = useProductsContext();
 
   const handleClick = async (id) => {
-    const response = await fetch("/api/blogs/" + id, {
+    const response = await fetch("/api/products/" + id, {
       method: "DELETE",
     });
     const json = await response.json();
 
     if (response.ok) {
-      dispatch({ type: "DELETE_BLOG", payload: json });
+      dispatch({ type: "DELETE_PRODUCT", payload: json });
     }
   };
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      const response = await fetch("/api/blogs");
+    const fetchProducts = async () => {
+      const response = await fetch("/api/products");
       const json = await response.json();
 
       if (response.ok) {
-        dispatch({ type: "SET_BLOGS", payload: json });
+        dispatch({ type: "SET_PRODUCTS", payload: json });
       }
     };
 
-    fetchBlogs();
+    fetchProducts();
   }, [dispatch]);
 
   return (
     <div className="home">
-      <div className="blogHeader">
-        <h2>Posts</h2>
+      <div className="productHeader">
+        <h2>Products</h2>
         <Link to="/create">
           <AiOutlinePlus size={12} />
           Add New
         </Link>
       </div>
-      <div className="blogs">
-        {blogs &&
-          blogs.map((blog) => (
-            <div className="blogContent" key={blog._id}>
-              <Link to="/about" state={blog} className="blogTitle">
-                {blog.title}
+      <div className="products">
+        {products &&
+          products.map((product) => (
+            <div className="productContent" key={product._id}>
+              {/* <Link to="/edit" state={product} className="productTitle">
+                {product.name}
                 <BsArrowUpRight size={12} />
-              </Link>
+              </Link> */}
+              <img
+                src={`${import.meta.env.VITE_BACKEND_URL}uploads/${
+                  product.image
+                }`}
+                alt="product image"
+              />
+              <div className="productDetails">
+                <p>
+                  <span>Product Name: </span>
+                  {product.name}
+                </p>
+                <p>
+                  <span>Product Unit: </span>
+                  {product.unit}
+                </p>
+                <p>
+                  <span>Product Price: </span>
+                  {product.price}
+                </p>
+                <p>
+                  <span>Product Expiry Date: </span>
+                  {new Date(product.expiry).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "2-digit",
+                  })}
+                </p>
+                <p>
+                  <span>Available Inventory Cost: </span>
+                  {product.inventory}
+                </p>
+              </div>
 
               <div className="buttons">
-                <Link to="/about" state={blog} className="edit">
+                <Link to="/edit" state={product} className="edit">
                   Edit
                 </Link>
 
@@ -60,7 +92,7 @@ const Home = () => {
                   href="#"
                   className="delete"
                   onClick={() => {
-                    handleClick(blog._id);
+                    handleClick(product._id);
                   }}
                 >
                   Delete
